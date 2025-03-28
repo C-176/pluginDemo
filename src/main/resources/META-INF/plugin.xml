@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <idea-plugin>
-    <id>com.yourcompany.deepseek</id>
+    <id>com.ryker.project</id>
     <name>DeepSeek Assistant</name>
     <vendor email="RTG1999@163.COM" url="https://www.3body.com">三体</vendor>
 
@@ -10,11 +10,18 @@
 
     <actions>
         <action id="DeepSeek.Action"
-                class="com.yourcompany.deepseek.DeepSeekAction"
+                class="com.ryker.project.DeepSeekAction"
                 text="DeepSeek 优化"
                 description="使用 DeepSeek 优化选中代码">
             <add-to-group group-id="EditMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D"/>
+        </action>
+         <action id="Ones.Query.Action"
+                class="com.ryker.project.OnesQueryAction"
+                text="ONES 查询"
+                description="使用 ONES 接口查询数据">
+            <add-to-group group-id="EditMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift O"/>
         </action>
     </actions>
 </idea-plugin>

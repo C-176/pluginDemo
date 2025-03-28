@@ -1,4 +1,4 @@
-package com.yourcompany.deepseek;
+package com.ryker.project;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
