@@ -32,6 +32,10 @@ tasks.withType<JavaCompile>().configureEach {
         file("C:\\Software\\jdk\\OpenJDK17U-jdk_x64_windows_hotspot_17.0.14_7\\jdk-17.0.14+7")
 }
 
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
 
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

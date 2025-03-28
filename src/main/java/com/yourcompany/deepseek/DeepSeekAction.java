@@ -62,7 +62,7 @@ public class DeepSeekAction extends AnAction {
 //            if (!response.isSuccessful()) throw new IOException("HTTP 错误: " + response.code());
 //            return GsonUtil.fromJson(response.body().string(), DeepSeekResponse.class).modifiedCode;
 //        }
-        return "xxxxxxxxxxxx";
+        return "发射点发射点发射点";
     }
 
 
