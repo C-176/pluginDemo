@@ -1,0 +1,18 @@
+<idea-plugin>
+    <id>com.yourcompany.deepseek</id>
+    <name>DeepSeek Assistant</name>
+    <vendor email="support@yourcompany.com" url="https://yourcompany.com">YourCompany</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+
+    <actions>
+        <action id="DeepSeek.Action"
+                class="com.yourcompany.deepseek.DeepSeekAction"
+                text="DeepSeek 优化"
+                description="使用 DeepSeek 优化选中代码">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D"/>
+        </action>
+    </actions>
+</idea-plugin>
