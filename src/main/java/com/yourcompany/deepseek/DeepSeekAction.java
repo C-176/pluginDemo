@@ -2,6 +2,7 @@ package com.yourcompany.deepseek;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -24,7 +25,7 @@ public class DeepSeekAction extends AnAction {
             return;
         }
 
-        // 调用 DeepSeek API（异步）
+
         new Thread(() -> {
             try {
                 String modifiedCode = callDeepSeekApi(selectedText, "优化这段代码");
@@ -45,30 +46,31 @@ public class DeepSeekAction extends AnAction {
         OkHttpClient client = new OkHttpClient();
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-        // 构建请求体
+
         String jsonBody = "{ \"code\": " + GsonUtil.toJson(code) + ", \"instruction\": \"" + instruction + "\" }";
         RequestBody body = RequestBody.create(jsonBody, JSON);
 
-        // 构建请求
+
         Request request = new Request.Builder()
                 .url("https://api.deepseek.com/v1/code")
                 .header("Authorization", "Bearer " + System.getenv("DEEPSEEK_API_KEY"))
                 .post(body)
                 .build();
 
-        // 发送请求并解析响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("HTTP 错误: " + response.code());
-            return GsonUtil.fromJson(response.body().string(), DeepSeekResponse.class).modifiedCode;
-        }
+
+//        try (Response response = client.newCall(request).execute()) {
+//            if (!response.isSuccessful()) throw new IOException("HTTP 错误: " + response.code());
+//            return GsonUtil.fromJson(response.body().string(), DeepSeekResponse.class).modifiedCode;
+//        }
+        return "xxxxxxxxxxxx";
     }
 
-    // 响应数据类
+
     private static class DeepSeekResponse {
         public String modifiedCode;
     }
 
-    // JSON 工具类
+
     private static class GsonUtil {
         private static final com.google.gson.Gson gson = new com.google.gson.Gson();
 

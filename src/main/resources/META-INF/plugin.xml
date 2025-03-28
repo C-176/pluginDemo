@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.yourcompany.deepseek</id>
     <name>DeepSeek Assistant</name>
-    <vendor email="support@yourcompany.com" url="https://yourcompany.com">YourCompany</vendor>
+    <vendor email="RTG1999@163.COM" url="https://www.3body.com">三体</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
@@ -11,7 +11,7 @@
                 class="com.yourcompany.deepseek.DeepSeekAction"
                 text="DeepSeek 优化"
                 description="使用 DeepSeek 优化选中代码">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D"/>
         </action>
     </actions>
