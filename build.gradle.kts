@@ -40,6 +40,9 @@ tasks.withType<JavaCompile> {
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    // git
+//    implementation("com.intellij:git4idea:241.1234")
+    implementation("cn.hutool:hutool-all:5.8.24") // 可根据实际情况调整版本号
 }
 
 intellij {

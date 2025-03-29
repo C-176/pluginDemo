@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<idea-plugin>
-    <id>com.ryker.project</id>
-    <name>DeepSeek Assistant</name>
+<idea-plugin require-restart="false">
+    <id>com.ryker.ones</id>
+    <name>ONES</name>
     <vendor email="RTG1999@163.COM" url="https://www.3body.com">三体</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.java</depends>
 
+
+
     <actions>
-        <action id="DeepSeek.Action"
-                class="com.ryker.project.DeepSeekAction"
-                text="DeepSeek 优化"
-                description="使用 DeepSeek 优化选中代码">
-            <add-to-group group-id="EditMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift D"/>
-        </action>
-         <action id="Ones.Query.Action"
-                class="com.ryker.project.OnesQueryAction"
-                text="ONES 查询"
-                description="使用 ONES 接口查询数据">
-            <add-to-group group-id="EditMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift O"/>
-        </action>
+        <group id="ONES.Actions" text="ONES" description="ONES Integration">
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+            <action id="QueryTasks" class="com.ryker.ones.QueryAction"
+                    text="查询任务" description="查询ONES任务列表"/>
+        </group>
     </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- 注册AuthUtil为应用级服务 -->
+    <applicationService serviceImplementation="com.ryker.ones.util.AuthUtil"/>
+        <!-- 添加通知组注册 -->
+    <notificationGroup id="ONES_Notification" displayType="BALLOON"/>
+        <toolWindow id="ONES Tasks" anchor="right"
+                    factoryClass="com.ryker.ones.factory.TaskToolWindowFactory"/>
+    </extensions>
+
+
 </idea-plugin>
