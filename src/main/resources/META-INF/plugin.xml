@@ -20,7 +20,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- 注册AuthUtil为应用级服务 -->
-    <applicationService serviceImplementation="com.ryker.ones.util.AuthUtil"/>
+    <applicationService serviceImplementation="com.ryker.ones.util.AuthConfig"/>
         <!-- 添加通知组注册 -->
     <notificationGroup id="ONES_Notification" displayType="BALLOON"/>
         <toolWindow id="ONES Tasks" anchor="right"

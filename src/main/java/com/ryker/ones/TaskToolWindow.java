@@ -1,5 +1,6 @@
 package com.ryker.ones;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -18,9 +19,12 @@ import com.ryker.ones.util.HttpClientUtil;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
@@ -37,12 +41,15 @@ public class TaskToolWindow {
     private final JComboBox<String> statusFilter;
 
     // 映射Map
-    public static final Map<String, String> STATUS_MAP = Map.of(
-            "全部", "",
-            "未开始", "to_do",
-            "进行中", "in_progress",
-            "已完成", "done"
-    );
+    public static final Map<String, String> STATUS_MAP = MapUtil.newHashMap(true);
+
+    static {
+        STATUS_MAP.put("全部", "");
+        STATUS_MAP.put("未开始", "to_do");
+        STATUS_MAP.put("进行中", "in_progress");
+        STATUS_MAP.put("已完成", "done");
+    }
+
     private int hoveredRow = -1;
     private int hoveredCol = -1;
 
@@ -60,6 +67,13 @@ public class TaskToolWindow {
         };
         this.taskTable = new JBTable(model);
         taskTable.setAutoCreateRowSorter(true); // 启用排序
+//        // 设置列宽比例
+//        taskTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+//        TableColumnModel columnModel = taskTable.getColumnModel();
+//        columnModel.getColumn(0).setPreferredWidth(15);  // 任务id列占15%
+//        columnModel.getColumn(1).setPreferredWidth(50);  // 任务名称列占50%
+//        columnModel.getColumn(2).setPreferredWidth(20);  // 状态列占20%
+//        columnModel.getColumn(3).setPreferredWidth(15);  // 负责人列占15%
 
         // 为表格添加鼠标事件监听器
         taskTable.addMouseListener(new MouseInputAdapter() {
@@ -174,6 +188,12 @@ public class TaskToolWindow {
         gbc.gridx = 1;
         gbc.weightx = 0.7;
         toolbar.add(statusFilter, gbc);
+        // 添加状态变化监听器
+//        statusFilter.addItemListener(e -> {
+//            if (e.getStateChange() == ItemEvent.SELECTED) {
+//                refreshData();
+//            }
+//        });
 
         gbc.gridx = 2;
         gbc.weightx = 1.0;
@@ -189,7 +209,7 @@ public class TaskToolWindow {
         contentPanel.add(new JBScrollPane(taskTable), BorderLayout.CENTER);
 
         // 初始加载数据
-        refreshData();
+//        refreshData();
     }
 
 
@@ -200,7 +220,7 @@ public class TaskToolWindow {
                 new Notification(
                         "ONES_Notification",
                         "复制成功",
-                        "已复制内容: " + text,
+                        text,
                         NotificationType.INFORMATION
                 ),
                 project

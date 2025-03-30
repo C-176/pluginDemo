@@ -13,6 +13,7 @@ import com.ryker.ones.dto.TaskDTO;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class HttpClientUtil {
     private static final String BASE_URL = "http://ones.inspur.com/project/api/project/team/HvBrmPic/items/graphql";
@@ -67,8 +68,17 @@ public class HttpClientUtil {
     private static List<TaskDTO> parseResult(String json) {
 
         JSONObject entries = JSONUtil.parseObj(json);
-        if (entries != null && entries.get("errorCode") != null)
+        if (entries != null && entries.get("errcode") != null) {
+            if ("401".equals(entries.get("code").toString())) {
+                AuthUtil.config.getState().token = "";
+                AuthUtil.config.saveConfig();
+                Notifications.Bus.notify(
+                        new Notification("ONES_Notification", "Token过期",
+                                "请重新登录", NotificationType.ERROR));
+                return Collections.emptyList();
+            }
             throw new RuntimeException(entries.getOrDefault("reason", "请求失败").toString());
+        }
         return entries
                 .getJSONObject("data")
                 .getJSONArray("buckets")
