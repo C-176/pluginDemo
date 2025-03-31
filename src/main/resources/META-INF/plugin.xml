@@ -25,6 +25,11 @@
     <notificationGroup id="ONES_Notification" displayType="BALLOON"/>
         <toolWindow id="ONES Tasks" anchor="right"
                     factoryClass="com.ryker.ones.factory.TaskToolWindowFactory"/>
+
+        <applicationConfigurable
+            instance="com.ryker.ones.OnesParamConfig"
+            id="com.ryker.ones.OnesParamConfig"
+            displayName="OnesParam"/>
     </extensions>
 
 

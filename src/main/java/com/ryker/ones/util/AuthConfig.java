@@ -50,10 +50,10 @@ public final class AuthConfig implements PersistentStateComponent<AuthConfig.Sta
             myState.token = "";
         }
         if (myState.pythonScriptPath == null) {
-            myState.pythonScriptPath = "script/get_token.py";
+            myState.pythonScriptPath = "";
         }
         if (myState.pythonExePath == null) {
-            myState.pythonExePath = "python";
+            myState.pythonExePath = "";
         }
         saveConfig();
     }
