@@ -67,13 +67,13 @@ public class TaskToolWindow {
         };
         this.taskTable = new JBTable(model);
         taskTable.setAutoCreateRowSorter(true); // 启用排序
-//        // 设置列宽比例
-//        taskTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-//        TableColumnModel columnModel = taskTable.getColumnModel();
-//        columnModel.getColumn(0).setPreferredWidth(15);  // 任务id列占15%
-//        columnModel.getColumn(1).setPreferredWidth(50);  // 任务名称列占50%
-//        columnModel.getColumn(2).setPreferredWidth(20);  // 状态列占20%
-//        columnModel.getColumn(3).setPreferredWidth(15);  // 负责人列占15%
+        // 设置列宽比例
+        taskTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        TableColumnModel columnModel = taskTable.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(15);  // 任务id列占15%
+        columnModel.getColumn(1).setPreferredWidth(50);  // 任务名称列占50%
+        columnModel.getColumn(2).setPreferredWidth(20);  // 状态列占20%
+        columnModel.getColumn(3).setPreferredWidth(15);  // 负责人列占15%
 
         // 为表格添加鼠标事件监听器
         taskTable.addMouseListener(new MouseInputAdapter() {
@@ -188,12 +188,12 @@ public class TaskToolWindow {
         gbc.gridx = 1;
         gbc.weightx = 0.7;
         toolbar.add(statusFilter, gbc);
-        // 添加状态变化监听器
-//        statusFilter.addItemListener(e -> {
-//            if (e.getStateChange() == ItemEvent.SELECTED) {
-//                refreshData();
-//            }
-//        });
+//         添加状态变化监听器
+        statusFilter.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                refreshData();
+            }
+        });
 
         gbc.gridx = 2;
         gbc.weightx = 1.0;
@@ -209,7 +209,7 @@ public class TaskToolWindow {
         contentPanel.add(new JBScrollPane(taskTable), BorderLayout.CENTER);
 
         // 初始加载数据
-//        refreshData();
+        refreshData();
     }
 
 

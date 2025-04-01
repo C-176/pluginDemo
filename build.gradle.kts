@@ -29,7 +29,7 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
     options.forkOptions.javaHome =
-        file("C:\\Software\\jdk\\OpenJDK17U-jdk_x64_windows_hotspot_17.0.14_7\\jdk-17.0.14+7")
+        file("D:\\software\\jdk\\jdk-17.0.14+7")
 }
 
 tasks.withType<JavaCompile> {
@@ -46,7 +46,7 @@ dependencies {
 }
 
 intellij {
-    localPath = "C:\\Software\\Toolbox\\IntelliJ IDEA Ultimate"
+    localPath = "D:\\JetBrains\\IntelliJ IDEA 2024.2.4"
     type = "IU"
     plugins.set(listOf("com.intellij.java"))
 }
@@ -55,7 +55,7 @@ intellij {
 tasks {
     patchPluginXml {
         sinceBuild.set("241.1234")
-        untilBuild.set("241.*")
+        untilBuild.set("*.*")
     }
 
 
