@@ -23,7 +23,9 @@ public class HttpClientUtil {
 
     public static final String SEARCH_PARAM = "search: $search\n    \n";
     private static final String YOUR_GRAPHQL_QUERY_STRING = "{\n    buckets (\n      groupBy: $groupBy\n      orderBy: $groupOrderBy\n      pagination: $pagination\n      filter: $groupFilter\n    ) {\n      key\n      \n      tasks (\n        filterGroup: $filterGroup\n        orderBy: $orderBy\n        limit: 2000\n        \n      includeAncestors:{pathField:\"path\"}\n      orderByPath: \"path\"\n    \n      search: $search\n    \n       ) {\n        \n    key\n    name\n    uuid\n    serverUpdateStamp\n    number\n    path\n    subTaskCount\n    subTaskDoneCount\n    position\n    status {\n      uuid\n      name\n      category\n    }\n    deadline(unit: ONESDATE)\n    subTasks {\n      uuid\n    }\n    issueType {\n      uuid\n      manhourStatisticMode\n    }\n    subIssueType {\n      uuid\n      manhourStatisticMode\n    }\n    project {\n      uuid\n    }\n    parent {\n      uuid\n    }\n    estimatedHours\n    remainingManhour\n    totalEstimatedHours\n    totalRemainingHours\n    issueTypeScope {\n      uuid\n    }\n\n        \n      importantField{\n        bgColor\n        color\n        name\n        value\n        fieldUUID\n      }\n      issueTypeScope {\n        uuid\n        currentLayout {\n          uuid\n          hasViewManhourTab\n        }\n      }\n    \n      }\n      pageInfo {\n        count\n        totalCount\n        startPos\n        startCursor\n        endPos\n        endCursor\n        hasNextPage\n        preciseCount\n      }\n    }\n    __extensions\n  }";
-
+    private static final String assign = """
+            assign_in:["$currentUser"]
+            """;
     public static List<TaskDTO> queryTasks(String searchKey, JSONArray filterGroup) {
         int retryCount = 0;
         while (retryCount < MAX_RETRIES) {

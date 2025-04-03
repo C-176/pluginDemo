@@ -20,15 +20,37 @@ public final class AuthConfig implements PersistentStateComponent<AuthConfig.Sta
 
     public static class State {
         private String token = "";
-        private String pythonScriptPath = "D:\\code\\work\\pluginDemo\\src\\main\\resources\\scripts\\get_token.py";
-        private String pythonExePath = "D:\\code\\selnium\\.venv\\Scripts\\python.exe";
+        private String pythonScriptPath = "";
+        private String pythonExePath = "";
+        private String name = "";
+        private String pwd = "";
+
         private String scriptArgs = "--no_log";
+
+        public String getPwd() {
+            return pwd;
+        }
+
+        public void setPwd(String pwd) {
+            this.pwd = pwd;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
 
         // 添加构造函数，确保所有字段都被初始化
         public State() {
             this.token = "";
-            this.pythonScriptPath = "D:\\code\\work\\pluginDemo\\src\\main\\resources\\scripts\\get_token.py";
-            this.pythonExePath = "D:\\code\\selnium\\.venv\\Scripts\\python.exe";
+            this.pythonScriptPath = "";
+            this.pythonExePath = "";
+            this.name = "";
+            this.pwd = "";
             this.scriptArgs = "--no_log";
         }
 
@@ -130,26 +152,22 @@ public final class AuthConfig implements PersistentStateComponent<AuthConfig.Sta
     }
 
     public void ensureConfigExists() {
-        boolean modified = false;
         if (myState.token == null) {
             myState.token = "";
-            modified = true;
         }
         if (myState.pythonScriptPath == null) {
-            myState.pythonScriptPath = "script/get_token.py";
-            modified = true;
+            myState.pythonScriptPath = "";
         }
         if (myState.pythonExePath == null) {
-            myState.pythonExePath = "python";
-            modified = true;
+            myState.pythonExePath = "";
         }
-        if (myState.scriptArgs == null) {
-        if (modified) {
-            saveConfig();
+        if (myState.name == null) {
+            myState.name = "";
         }
-            modified = true;
-            myState.scriptArgs = "";
+        if (myState.pwd == null) {
+            myState.pwd = "";
         }
+
         saveConfig();
     }
 }

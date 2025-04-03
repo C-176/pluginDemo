@@ -43,7 +43,8 @@ public class OnesParam {
         });
 
         // 添加输入框和按钮
-        panel.add(textField, BorderLayout.CENTER);
+        panel.add(new JLabel(title), BorderLayout.WEST);
+        panel.add(new JTextField(), BorderLayout.CENTER);
         panel.add(button, BorderLayout.EAST);
 
         return panel;
@@ -51,19 +52,18 @@ public class OnesParam {
 
     public OnesParam() {
         // 确保所有组件都已初始化
-        if (mainPanel == null) {
-            mainPanel = new JPanel();
-            // 设置布局管理器
-            mainPanel.setLayout(new GridLayoutManager(4, 2));
-        }
+        mainPanel = new JPanel();
+        // 设置布局管理器
+        mainPanel.setLayout(new GridLayoutManager(4, 2));
 
-        // 确保所有组件都已添加到面板
-        if (pythonScriptPath != null) {
-            mainPanel.add(createFileChooserField(pythonScriptPath, "选择 Python 脚本", ".py"));
-        }
-        if (pythonExePath != null) {
-            mainPanel.add(createFileChooserField(pythonExePath, "选择 Python 解释器", ".exe"));
-        }
+//        // 确保所有组件都已添加到面板
+//        if (pythonScriptPath != null) {
+//            pythonScriptPath.remove(pythonScriptPath);
+//        }
+//        mainPanel.add(createFileChooserField(pythonScriptPath, "选择 Python 脚本", ".py"));
+//        if (pythonExePath == null) {
+//            mainPanel.add(createFileChooserField(pythonExePath, "选择 Python 解释器", ".exe"));
+//        }
 
         pythonScriptPath.addFocusListener(new FocusAdapter() {
             @Override
@@ -140,7 +140,7 @@ public class OnesParam {
         return mainPanel;
     }
 
-    private JPanel mainPanel;
+    private  JPanel mainPanel;
 
     public JTextField getPythonScriptPath() {
         return pythonScriptPath;
