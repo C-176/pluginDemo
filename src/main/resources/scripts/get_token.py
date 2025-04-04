@@ -1,8 +1,7 @@
 import json
 import time
-
-
 import logging
+from logging.handlers import TimedRotatingFileHandler
 from selenium import webdriver
 from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
@@ -12,13 +11,29 @@ from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.edge.options import Options
 from threading import Thread
 import sys
+import os
 
 # 配置日志
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+log_file = "token_fetcher.log"
+if os.path.exists(log_file):
+    os.remove(log_file)
+
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# 创建TimedRotatingFileHandler，每天午夜滚动日志，保留7天
+file_handler = TimedRotatingFileHandler(
+    log_file,
+    when="midnight",
+    interval=1,
+    backupCount=7
+)
+
+# 添加控制台日志
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(console_handler)
+
 
 class TokenFetcher:
     def __init__(self):
@@ -58,7 +73,20 @@ class TokenFetcher:
     def _navigate_to_task_page(self):
         logger.info("正在导航到任务页面...")
         self.driver.get(self.TASK_URL)
-        # time.sleep(3)  # 等待页面加载
+        # 使用 any_of 方法同时等待多个元素中的任意一个变得可见
+
+        try:
+            logger.info("开始等待元素可见...")
+            WebDriverWait(self.driver, 60).until(
+                EC.any_of(
+                    EC.visibility_of_element_located(
+                        (By.XPATH, '//*[@id="root"]/div/div/div/img')),
+                    EC.visibility_of_element_located((By.XPATH, '//*[@id="sidebar-nav"]/div[1]/a/img'))
+                )
+            )
+            logger.info("元素已可见")
+        except Exception as e:
+            logger.error(f"等待元素可见时发生错误", e)
 
     def _needs_login(self):
         try:

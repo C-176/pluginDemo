@@ -48,6 +48,12 @@ public class AuthUtil {
                 String pythonScriptPath = getConfig().getState().getPythonScriptPath();
                 String scriptArgs = getConfig().getState().getScriptArgs(); // 获取脚本参数
 
+                // 检查 Python 环境变量是否配置
+                if (StrUtil.isBlank(pythonExePath) || StrUtil.isBlank(pythonScriptPath)) {
+                    Messages.showMessageDialog("Python 解释器及脚本未配置，请在设置中配置", "错误", Messages.getErrorIcon());
+                    return null;
+                }
+
                 // 获取脚本所在目录
                 File scriptFile = new File(pythonScriptPath);
                 String workingDir = scriptFile.getParentFile().toString();

@@ -40,6 +40,11 @@ public class TaskToolWindow {
     private final JTextField searchField;
     private final JComboBox<String> statusFilter;
 
+    // 分页状态
+    public static boolean hasNextPage = true;
+    public static String endCursor = "";
+    public static int totalCount = 0;
+
     // 映射Map
     public static final Map<String, String> STATUS_MAP = MapUtil.newHashMap(true);
 
@@ -50,12 +55,24 @@ public class TaskToolWindow {
         STATUS_MAP.put("已完成", "done");
     }
 
-    private int hoveredRow = -1;
-    private int hoveredCol = -1;
 
     public TaskToolWindow(Project project, ToolWindow toolWindow) {
         this.project = project;
         this.contentPanel = new SimpleToolWindowPanel(true);
+
+        // 设置窗口图标
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/Icons/Bell.ico"));
+            if (icon != null && icon.getImage() != null) {
+                Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(contentPanel);
+                if (parentFrame != null) {
+                    parentFrame.setIconImage(icon.getImage());
+                }
+            }
+        } catch (Exception e) {
+           System.err.println("无法加载图标: " + e.getMessage());
+
+        }
 
         // 初始化表格
         String[] columns = {"任务id", "任务", "状态", "负责人"};
@@ -77,29 +94,6 @@ public class TaskToolWindow {
 
         // 为表格添加鼠标事件监听器
         taskTable.addMouseListener(new MouseInputAdapter() {
-
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                int row = taskTable.rowAtPoint(e.getPoint());
-                int col = taskTable.columnAtPoint(e.getPoint());
-                if ((col == 0 || col == 1) && row != -1) {
-                    hoveredRow = row;
-                    hoveredCol = col;
-                    taskTable.repaint(taskTable.getCellRect(row, col, false));
-                }
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                if (hoveredRow != -1 && hoveredCol != -1) {
-                    int oldRow = hoveredRow;
-                    int oldCol = hoveredCol;
-                    hoveredRow = -1;
-                    hoveredCol = -1;
-                    taskTable.repaint(taskTable.getCellRect(oldRow, oldCol, false));
-                }
-            }
 
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -129,42 +123,9 @@ public class TaskToolWindow {
                 }
             }
 
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int row = taskTable.rowAtPoint(e.getPoint());
-                int col = taskTable.columnAtPoint(e.getPoint());
-                if ((col == 0 || col == 1) && row != -1) {
-                    if (hoveredRow != row || hoveredCol != col) {
-                        if (hoveredRow != -1 && hoveredCol != -1) {
-                            taskTable.repaint(taskTable.getCellRect(hoveredRow, hoveredCol, false));
-                        }
-                        hoveredRow = row;
-                        hoveredCol = col;
-                        taskTable.repaint(taskTable.getCellRect(row, col, false));
-                    }
-                } else {
-                    if (hoveredRow != -1 && hoveredCol != -1) {
-                        taskTable.repaint(taskTable.getCellRect(hoveredRow, hoveredCol, false));
-                        hoveredRow = -1;
-                        hoveredCol = -1;
-                    }
-                }
-            }
         });
 
-//        // 自定义表格渲染器，实现下划线效果
-//        taskTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//                if ((column == 0 || column == 1) && ((MouseInputAdapter) taskTable.getMouseListeners()[0]).hoveredRow == row && ((MouseInputAdapter) taskTable.getMouseListeners()[0]).hoveredCol == column) {
-//                    setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLUE));
-//                } else {
-//                    setBorder(null);
-//                }
-//                return c;
-//            }
-//        });
+
 
         // 初始化搜索组件
         JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
@@ -206,12 +167,53 @@ public class TaskToolWindow {
         // 组装界面
         contentPanel.setLayout(new BorderLayout());
         contentPanel.add(toolbar, BorderLayout.NORTH);
-        contentPanel.add(new JBScrollPane(taskTable), BorderLayout.CENTER);
+        JBScrollPane jbScrollPane = new JBScrollPane(taskTable);
+        contentPanel.add(jbScrollPane, BorderLayout.CENTER);
+        contentPanel.setMinimumSize(new Dimension(400, 200));
+
+        // 添加滚动事件监听器
+        jbScrollPane.getVerticalScrollBar().addAdjustmentListener(e -> {
+            JScrollBar scrollBar = (JScrollBar) e.getSource();
+            int extent = scrollBar.getModel().getExtent();
+            int maximum = scrollBar.getModel().getMaximum();
+            int value = scrollBar.getValue();
+
+            // 判断是否滚动到底部并且hasNextPage为true
+            if ((value + extent) == maximum && hasNextPage) {
+                try {
+                    JSONArray objects = new JSONArray();
+                    JSONObject filterGroup = JSONUtil.createObj().set("assign_in", Collections.singletonList("${currentUser}"));
+                    objects.add(filterGroup);
+                    if (StrUtil.isNotBlank((String) statusFilter.getSelectedItem()) && !statusFilter.getSelectedItem().equals("全部")) {
+                        filterGroup.set("statusCategory_in", Collections.singletonList(STATUS_MAP.get(statusFilter.getSelectedItem())));
+                    }
+                    List<TaskDTO> tasks = HttpClientUtil.queryTasks(searchField.getText(), objects, endCursor);
+                    updateTable(tasks,true);
+                } catch (Exception ex) {
+                    Notifications.Bus.notify(
+                            new Notification(
+                                    "ONES_Notification", // 使用注册的通知组ID
+                                    "请求失败",
+                                    ex.getMessage(),
+                                    NotificationType.ERROR
+                            ),
+                            project
+                    );
+                }
+            }
+        });
+
 
         // 初始加载数据
         refreshData();
     }
 
+     // 添加分页状态重置方法
+    private void resetPagination() {
+        hasNextPage = true;
+        endCursor = "";
+        totalCount = 0;
+    }
 
     private void copyToClipboard(String text) {
         StringSelection selection = new StringSelection(text);
@@ -228,20 +230,24 @@ public class TaskToolWindow {
     }
 
     public void refreshData() {
+        // 重置分页状态
+        resetPagination();
         String searchText = searchField.getText().trim();
 
         String status = (String) statusFilter.getSelectedItem();
 
         try {
+            // assign_in 负责人
+            // statusCategory_in 状态
+            // watchers_in 关注人
             JSONArray objects = new JSONArray();
-            JSONObject filterGroup = JSONUtil.createObj().set("watchers_in", Collections.singletonList("${currentUser}"));
+            JSONObject filterGroup = JSONUtil.createObj().set("assign_in", Collections.singletonList("${currentUser}"));
             objects.add(filterGroup);
             if (StrUtil.isNotBlank(status) && !status.equals("全部")) {
                 filterGroup.set("statusCategory_in", Collections.singletonList(STATUS_MAP.get(status)));
-
             }
-            List<TaskDTO> tasks = HttpClientUtil.queryTasks(searchField.getText(), objects);
-            updateTable(tasks);
+            List<TaskDTO> tasks = HttpClientUtil.queryTasks(searchField.getText(), objects,null);
+            updateTable(tasks,false);
         } catch (Exception e) {
             Notifications.Bus.notify(
                     new Notification(
@@ -303,9 +309,9 @@ public class TaskToolWindow {
 //    }
 //}
 
-    private void updateTable(List<TaskDTO> tasks) {
+    private void updateTable(List<TaskDTO> tasks,boolean firstPage) {
         DefaultTableModel model = (DefaultTableModel) taskTable.getModel();
-        model.setRowCount(0); // 清空旧数据
+        if(!firstPage) model.setRowCount(0); // 清空旧数据
 
         for (TaskDTO task : tasks) {
             model.addRow(new Object[]{

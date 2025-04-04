@@ -10,6 +10,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.ryker.ones.dto.TaskDTO;
+import com.ryker.ones.TaskToolWindow;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,10 +24,8 @@ public class HttpClientUtil {
 
     public static final String SEARCH_PARAM = "search: $search\n    \n";
     private static final String YOUR_GRAPHQL_QUERY_STRING = "{\n    buckets (\n      groupBy: $groupBy\n      orderBy: $groupOrderBy\n      pagination: $pagination\n      filter: $groupFilter\n    ) {\n      key\n      \n      tasks (\n        filterGroup: $filterGroup\n        orderBy: $orderBy\n        limit: 2000\n        \n      includeAncestors:{pathField:\"path\"}\n      orderByPath: \"path\"\n    \n      search: $search\n    \n       ) {\n        \n    key\n    name\n    uuid\n    serverUpdateStamp\n    number\n    path\n    subTaskCount\n    subTaskDoneCount\n    position\n    status {\n      uuid\n      name\n      category\n    }\n    deadline(unit: ONESDATE)\n    subTasks {\n      uuid\n    }\n    issueType {\n      uuid\n      manhourStatisticMode\n    }\n    subIssueType {\n      uuid\n      manhourStatisticMode\n    }\n    project {\n      uuid\n    }\n    parent {\n      uuid\n    }\n    estimatedHours\n    remainingManhour\n    totalEstimatedHours\n    totalRemainingHours\n    issueTypeScope {\n      uuid\n    }\n\n        \n      importantField{\n        bgColor\n        color\n        name\n        value\n        fieldUUID\n      }\n      issueTypeScope {\n        uuid\n        currentLayout {\n          uuid\n          hasViewManhourTab\n        }\n      }\n    \n      }\n      pageInfo {\n        count\n        totalCount\n        startPos\n        startCursor\n        endPos\n        endCursor\n        hasNextPage\n        preciseCount\n      }\n    }\n    __extensions\n  }";
-    private static final String assign = """
-            assign_in:["$currentUser"]
-            """;
-    public static List<TaskDTO> queryTasks(String searchKey, JSONArray filterGroup) {
+
+    public static List<TaskDTO> queryTasks(String searchKey, JSONArray filterGroup, String endCursor) {
         int retryCount = 0;
         while (retryCount < MAX_RETRIES) {
             try {
@@ -52,6 +51,12 @@ public class HttpClientUtil {
                         .set("pagination", JSONUtil.createObj()
                                 .set("limit", 50)
                                 .set("preciseCount", false));
+
+                        if (StrUtil.isNotBlank(endCursor)) {
+                            variables.set("pagination", JSONUtil.createObj()
+                                    .set("limit", 50)
+                                    .set("after", endCursor));
+                        }
 
                 String result = HttpRequest.post(BASE_URL + "?t=group-task-data")
                         .setConnectionTimeout(CONNECT_TIMEOUT)  // 新增连接超时设置
@@ -88,7 +93,6 @@ public class HttpClientUtil {
     }
 
     private static List<TaskDTO> parseResult(String json) {
-
         JSONObject entries = JSONUtil.parseObj(json);
         if (entries != null && entries.get("errcode") != null) {
             if ("401".equals(entries.get("code").toString())) {
@@ -101,10 +105,18 @@ public class HttpClientUtil {
             }
             throw new RuntimeException(entries.getOrDefault("reason", "请求失败").toString());
         }
-        return entries
+        JSONObject jsonObject = entries
                 .getJSONObject("data")
                 .getJSONArray("buckets")
-                .getJSONObject(0)
+                .getJSONObject(0);
+
+        JSONObject pageInfo = jsonObject.getJSONObject("pageInfo");
+        // 更新分页信息
+        TaskToolWindow.hasNextPage = pageInfo.getBool("hasNextPage");
+        TaskToolWindow.totalCount = pageInfo.getInt("totalCount");
+        TaskToolWindow.endCursor = pageInfo.getStr("endCursor");
+
+        return jsonObject
                 .getJSONArray("tasks")
                 .toList(TaskDTO.class);
     }

@@ -3,7 +3,6 @@ package com.ryker.ones;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.uiDesigner.core.GridLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,20 +50,6 @@ public class OnesParam {
     }
 
     public OnesParam() {
-        // 确保所有组件都已初始化
-        mainPanel = new JPanel();
-        // 设置布局管理器
-        mainPanel.setLayout(new GridLayoutManager(4, 2));
-
-//        // 确保所有组件都已添加到面板
-//        if (pythonScriptPath != null) {
-//            pythonScriptPath.remove(pythonScriptPath);
-//        }
-//        mainPanel.add(createFileChooserField(pythonScriptPath, "选择 Python 脚本", ".py"));
-//        if (pythonExePath == null) {
-//            mainPanel.add(createFileChooserField(pythonExePath, "选择 Python 解释器", ".exe"));
-//        }
-
         pythonScriptPath.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -117,6 +102,7 @@ public class OnesParam {
                 }
             }
         });
+
     }
 
     public JTextField getName() {
@@ -127,39 +113,24 @@ public class OnesParam {
         return pwd;
     }
 
-    public void setName(JTextField name) {
-        this.name = name;
-    }
-
-    public void setPwd(JTextField pwd) {
-        this.pwd = pwd;
-    }
-
 
     public JPanel getMainPanel() {
         return mainPanel;
     }
 
-    private  JPanel mainPanel;
+    private JPanel mainPanel;
 
     public JTextField getPythonScriptPath() {
         return pythonScriptPath;
-    }
-
-    public void setPythonScriptPath(JTextField pythonScriptPath) {
-        this.pythonScriptPath = pythonScriptPath;
     }
 
     public JTextField getPythonExePath() {
         return pythonExePath;
     }
 
-    public void setPythonExePath(JTextField pythonExePath) {
-        this.pythonExePath = pythonExePath;
-    }
-
     private JTextField pythonScriptPath;
     private JTextField pythonExePath;
+    private JTextPane a1如果需要脚本自动获取token的需要准备好python环境TextPane;
 }
 
 
